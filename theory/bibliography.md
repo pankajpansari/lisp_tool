@@ -1,0 +1,1 @@
+[1] M. Nezhurina, L. Cipolina-Kun, M. Cherti, and J. Jitsev, ‘Alice in Wonderland: Simple Tasks Showing Complete Reasoning Breakdown in State-Of-the-Art Large Language Models’. arXiv, Jun. 05, 2024. doi: 10.48550/arXiv.2406.02061.
