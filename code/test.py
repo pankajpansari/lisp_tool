@@ -8,11 +8,16 @@ def generate_tests(code, file, n) :
         test_code = file.at[n, test_name]
         test_output = f'Res{i}'
         output_res = file.at[n, test_output]
-        scheme_code = code + "\n" + test_code
+        atom_def = """
+        (define atom?
+          (lambda (x)
+            (and (not (pair? x)) (not (null? x)))))
+        """
+        scheme_code = atom_def + "\n" + code + "\n" + test_code
         test_dict[scheme_code] = output_res
         
     return test_dict
-  
+
 def run_tests(code, file, n):
     
     test_dict = generate_tests(code, file, n)
@@ -31,6 +36,10 @@ def run_tests(code, file, n):
         errors = result.stderr
     
         subprocess.run(["rm", temp_file_path])
+        
+        print(output)
+        print(errors)
+        #print(test_dict[code])
         
         if output != test_dict[code] : 
             result = False
