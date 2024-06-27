@@ -1,0 +1,390 @@
+FunctionName,Explanation,Definition,Test1,Res1,Test2,Res2,Test3,Res3
+lat?,Checks if a list is a list of atoms,"(define lat?
+(lambda (l)
+(cond
+((null? l) #t )
+((atom? (car l)) (lat? (cdr l)))
+(else #f ))))",(display (lat? ‘(“here” “is” “a” “lat”))),#t,(display (lat? ‘(“is” (“not” “a” “lat”)))),#f,(display (lat? ‘(“is” “a” “lat”))),#t
+member?,Checks if an atom is a member of a list,"(define member?
+(lambda (m l)
+(cond
+((null? l) #f )
+((eq? m (car l)) #t )
+((atom? (car l)) (member? m (cdr l)))
+(else #f ))))", (member? “meat” (“meat” “is” “here”)),#t, (member? “meat” (“fish” “is” “here”)),#f, (member? “fish” (“meat” “is” “here”)),#t
+rember,Removes the first occurrence of an atom from a list,"(define rember
+(lambda (a l)
+(cond
+((atom? a) 
+((null? l) l)
+((eq? a (car l)) (rember a (cdr l)))
+((else (cons (car l) (rember a (cdr l))))))))",,,,,,
+firsts,Returns a list of the first S-expression of each internal list,"(define firsts
+(lambda (l)
+(cond
+((null? l) ())
+((cons (car (car l)) (firsts (cdr l))))
+(else ())))))",,,,,,
+insertR,Inserts an atom to the right of the first occurrence of another atom in a list,"(define insertR
+(lambda (new old lat)
+(cond
+((null? lat) lat)
+((atom? (car lat))
+(cond
+((eq? old (car lat)) (cons (cons lat new) old))
+((insertR new old (cdr lat)))
+)
+)
+(else lat)
+)))",,,,,,
+insertL,Inserts an atom to the left of the first occurrence of another atom in a list,"(define insertL
+(lambda (al bl l)
+(cond
+((atom? al) (insertL al bl l))
+((null? l) l)
+((eq? (car l) bl) (cons al (cons (car l) l)))
+((atom? (car l)) (cons (car l) (insertL al bl (cdr l))))
+(else l))))",,,,,,
+subst,Substitutes the first occurrence of an old atom with a new atom in a list,"(define subst 
+(lambda (old new l)
+(cond
+((null? l) l)
+((eq? (car l) old) (cons new (cdr l)))
+((atom? (car l)) (cons (car l) (subst old new (cdr l))))
+(else (cons (car l) (subst old new (cdr l)))))))",,,,,,
+subst2,Substitutes the first occurrence of either of two old atoms with a new atom,"(define subst2
+(lambda (o1 o2 new l)
+(cond
+((atom? (car l)) 
+  (cond
+   ((eq? (car l) o1) (cons new (cdr l)))
+   ((eq? (car l) o2) (cons new (cdr l)))
+   (else (subst2 o1 o2 new (cdr l)))))
+ (else l))))",,,,,,
+multirember,Removes all occurrences of an atom from a list,"(define multirember
+(lambda (a l)
+(cond
+((null? l) l)
+((eq? a (car l)) (multirember a (cdr l)))
+((else (cons (car l) (multirember a (cdr l))))))))",,,,,,
+multiinsertR,Inserts a new atom to the right of every occurrence of an old atom in a list,"(define multiinsertR
+(lambda (old new l)
+(cond
+((null? l) l)
+((eq? (car l) old) (cons (cons (car l) new) (multiinsertR old new (cdr l))))
+((atom? (car l)) (cons (car l) (multiinsertR old new (cdr l))))
+(else (multiinsertR old new (cdr l)))
+)))",,,,,,
+multiinsertL,Inserts a new atom to the left of every occurrence of an old atom in a list,"(define multiinsertL
+(lambda (old new l)
+(cond
+((null? l) l)
+((eq? (car l) old) (cons new (cons (car l) (multiinsertL old new (cdr l)))))
+((atom? (car l)) (cons (car l) (multiinsertL old new (cdr l))))
+(else (multiinsertL old new (cdr l))))))",,,,,,
+multisubst,Substitutes all occurrences of an old atom with a new atom in a list,"(define multisubst
+(lambda (old new l)
+(cond
+((null? l) l)
+((atom? (car l))
+(cond
+((eq? (car l) old) (cons new (multisubst old new (cdr l))))
+(#t (cons (car l) (multisubst old new (cdr l))))))
+(else (cons (car l) (multisubst old new (cdr l)))))))",,,,,,
+add1,Adds 1 to a number,"(define add1
+(lambda (n)
+(cond
+((atom? n) (cons (car (cons n ())) ()))
+(else #f ))))",,,,,,
+add,Adds two numbers,"(define add
+(lambda (n m)
+(cond
+((atom? n) (atom? m) (add1 (add1 (cons () n))))
+((atom? n) (cond
+((null? m) (cons () n))
+((atom? (car m)) (add (car m) (add n (cdr m))))
+(else (cons () n))))
+((cond
+((null? n) (cons () m))
+((atom? (car n)) (add (car n) (add m (cdr n))))
+(else (cons () m)))
+(else (cons () ())))))",,,,,,
+subtract,Subtracts one number from another,"(define subtcart
+(lambda (n m)
+(cond
+((atom? n) (atom? m) (cons (cons () (add1 (add (- 0) n))) (add1 (add (- 0) m))))
+(else #f))))",,,,,,
+addtup,Adds all numbers in a tuple (list of numbers),"(define addtup
+(lambda (tup)
+(cond
+((null? tup) 0 )
+((atom? (car tup)) (add (car tup) (addtup (cdr tup))))
+(else 0 ))))",,,,,,
+multiply,Multiplies two numbers,"(define multiply
+(lambda (x y)
+(cond
+((atom? x) (atom? y) (* x y))
+(else #f))))",,,,,,
+tup+,Adds corresponding elements of two tuples,"(define tup+
+(lambda (tup1 tup2)
+(cond
+((null? tup1) (cons () ()))
+((null? tup2) (cons () ()))
+((atom? (car tup1)) (atom? (car tup2)) (cons (add (car tup1) (car tup2)) (tup+ (cdr tup1) (cdr tup2))))
+(else (cons () ())))))",,,,,,
+>,Checks if first number is greater than second,"(define >
+(lambda (n l)
+(cond
+((atom? n) (atom? (car l)) (> (add1 (car l)) n) #t)
+((atom? n) (atom? (car l)) (eq? n (car l)) #f)
+((atom? n) (null? l) #f)
+(else #f))))",,,,,,
+<,Checks if first number is less than second,"(define <
+(lambda (n m)
+(cond
+((eq? n m) #f )
+((> m n) #f )
+(else #t ))))",,,,,,
+=,Checks if two numbers are equal,"(define =
+(lambda (n m)
+(cond
+((eq? n m) #t )
+(else #f ))))",,,,,,
+^,Raises a number to a power (exponent),"(define ^ 
+(lambda (n m)
+(cond
+((= m 0) 1)
+((= m 1) n)
+(else (* n (^ n (- m 1)))))))",,,,,,
+/,Divides one number by another,"(define / 
+(lambda (n m)
+(cond
+((= m 0) (error ""division by zero""))
+((number? n) (number? m) (/ n m))
+(else #f))))",,,,,,
+length,Calculates the length of a list,"(define length
+(lambda (l)
+(cond
+((null? l) 0 )
+(#t (add1 (length (cdr l))))
+(else #f ))))",,,,,,
+pick,Selects the nth element from a list,"(define pick
+(lambda (n l)
+(cond
+((= n 1) (car l))
+((> n 1) (pick (- n 1) (cdr l)))
+(else #f))))",,,,,,
+rempick,Removes the nth element from a list,"(define rempick
+(lambda (l n)
+(cond
+((= n 1) (cdr l))
+((> n 1) (cons (car l) (rempick (cdr l) (- n 1))))
+(else l))))",,,,,,
+number?,Checks if an S-expression is a number,"(define number?
+(lambda (x)
+(cond
+((atom? x) (eq? x (car (cons 1 ()))) )
+(else #f ))))",,,,,,
+no-nums,Removes all numbers from a list,"(define no-nums
+(lambda (l)
+(cond
+((null? l) ())
+((number? (car l)) (no-nums (cdr l)))
+((no-nums (cons (car l) (no-nums (cdr l))))))))",,,,,,
+occur,Counts occurrences of an atom in a list,"(define occur?
+(lambda (a l)
+(cond
+((null? l) 0 )
+((eq? (car l) a) (add1 (occur? a (cdr l))))
+((occur? a (cdr l)))
+(else 0))))",,,,,,
+all-nums,Extracts all numbers from a list,"(define all-nums
+(lambda (l)
+(cond
+((null? l) ())
+((number? (car l)) (cons (car l) (all-nums (cdr l))))
+(else (all-nums (cdr l))))))",,,,,,
+one?,Checks if a number is 1,"(define one?
+(lambda (n)
+(cond
+((number? n) (= n 1))
+(else #f ))))",,,,,,
+eqan?,Checks if two arguments are equal (atom or number),"(define eqan?
+(lambda (a b)
+(cond
+((atom? a) (cond
+((atom? b) (eq? a b))
+((number? b) #f )))
+((number? a) (cond
+((number? b) (= a b))
+((atom? b) #f )))
+(else #f ))))",,,,,,
+rember*,Removes all occurrences of an atom from all levels of a nested list,"(define rember*
+(lambda (l x)
+(cond
+((null? l) l)
+((atom? (car l)) (cond
+((eq? (car l) x) (rember* (cdr l) x))
+(#t (cons (rember* (car l) x) (rember* (cdr l) x)))))
+(#t (cons (rember* (car l) x) (rember* (cdr l) x))))))",,,,,,
+insertR*,Inserts new atom to the right of all occurrences of old atom in a nested list,"(define insertR*
+(lambda (new old l)
+(cond
+((null? l) l)
+((atom? (car l)) (cons (car l) (insertR* new old (cdr l))))
+((insertR* new old (car l)) (insertR* new old (cdr l)))
+(else (insertR* new old l)))))",,,,,,
+occur*,Counts occurrences of an atom in a nested list,"(define occur*
+(lambda (a l)
+(cond
+((null? l) 0)
+((atom? (car l)) (add1 (occur* a (cdr l))))
+((occur* a (car l)) (occur* a (cdr l)))
+(else (occur* a (car l))))))",,,,,,
+subst*,Substitutes new atom for all occurrences of old atom in a nested list,"(define subst*
+(lambda (new old l)
+(cond
+((null? l) l)
+((atom? (car l)) (cons (eq? (car l) old) (subst* new old (cdr l))))
+((null? (car l)) (cons (subst* new old (car l)) (subst* new old (cdr l))))
+(else (subst* new old l)))))",,,,,,
+insertL*,Inserts new atom to the left of all occurrences of old atom in a nested list,"(define insertL*
+(lambda (old new l)
+(cond
+((null? l) l)
+((atom? (car l)) (cons (cons new (car l)) (insertL* old new (cdr l))))
+((insertL* old new (car l)) (insertL* old new (cdr l)))
+(else (insertL* old new l)))))",,,,,,
+member*,Checks if an atom is a member of a nested list,"(define member*
+(lambda (a l)
+(cond
+((null? l) #f )
+((atom? (car l)) (eq? a (car l)))
+((atom? a) (member* a (cdr l)))
+((member* a (car l)) #t)
+((member* a (cdr l)) #t)
+(else #f ))))",,,,,,
+leftmost,Finds the leftmost atom in a nested non-empty list of atoms,"(define leftmost
+(lambda (l)
+(cond
+((null? l) (car l))
+((atom? (car l)) (car l))
+((leftmost (cdr l)) (leftmost (car (defined l))))
+(else (leftmost (defined l)))
+)))",,,,,,
+eqlist?,Checks if two lists are equal,"(define eqlist?
+(lambda (l1 l2)
+(cond
+((null? l1) (null? l2))
+((null? l1) #f)
+((null? l2) #f)
+((eq? (car l1) (car l2)) (eqlist? (cdr l1) (cdr l2)))
+(else #f))))",,,,,,
+equal?,Checks if two S-expressions are equal,"(define equal?
+(lambda (se1 se2)
+(cond
+((atom? se1) (cond
+((atom? se2) (eq? se1 se2))
+((null? se1) (cond
+((null? se2) #t)
+((lambda (f r) (cond
+((equal? (car se1) (car se2)) (equal? (cdr se1) (cdr se2)))
+(else #f))))))
+((null? se2) #f)
+(else #f)))))",,,,,,
+numbered?,"Determines if a representation of an arithmetic expression contains only numbers apart from +, multiply and ^","(define numbered?
+(lambda (e)
+(cond
+((atom? e) (number? e))
+((null? e) #t)
+((eq? (car e) '+) (numbered? (cdr e)))
+((eq? (car e) '*) (numbered? (cdr e)))
+((eq? (car e) '^) (numbered? (cdr e)))
+((lambda (x)
+(cond
+((null? x) #f)
+((numbered? x) (numbered? (cdr x)))
+(else #f))) (cdr e))
+(else #f))))",,,,,,
+value,Evaluates a numbered arithmetic expression,"(define value
+(lambda (e)
+(cond
+((number? e) e)
+((atom? e) (error ""not a number""))
+((null? e) (error ""empty list""))
+((= (length e) 3)
+  (lambda (op a b)
+    (cond
+      ((eq? op '+) (add a b))
+      ((eq? op '*) (multiply a b))
+      ((eq? op '^) (^ a b))
+      (else (error ""unknown operator""))
+    )
+  )
+)
+((else (error ""unknown expression""))
+)))",,,,,,
+1st-sub-exp,Extracts the first sub-expression of an arithmetic expression,"(define 1st-sub-exp
+(lambda (e)
+(cond
+((atom? e) e)
+((null? e) (1st-sub-exp (car e)))
+(else (1st-sub-exp (car e))))))",,,,,,
+2nd-sub-exp,Extracts the second sub-expression of an arithmetic expression,"(define 2nd-sub-exp
+(lambda (e)
+(cond
+((atom? e) (2nd-sub-exp (car e)))
+((null? (cdr e)) (2nd-sub-exp (car (cdr e))))
+((eq? (car e) '+) (car (cdr e)))
+((eq? (car e) '*) (car (cdr e)))
+((eq? (car e) '^) (car (cdr e)))
+(else (2nd-sub-exp (car (cdr e)))))))",,,,,,
+operator,Extracts the operator from an arithmetic expression,"(define operator
+(lambda (e)
+(cond
+((atom? (car e)) (car e))
+((null? (cdr e)) (operator (car (cdr e))))
+(else #f))))",,,,,,
+sero?,Checks if a number represented as a list is zero,"(define sero?
+(lambda (l)
+(cond
+((null? l) #t )
+((atom? (car l)) (sero? (cdr l)))
+(else #f ))))",,,,,,
+edd1,Adds 1 to a number represented as a list,"(define edd1
+(lambda (n)
+(cond
+((number? n) (add1 (value n)))
+(else (cons (add1 (car n)) (edd1 (cdr n)))))))",,,,,,
+zub1,Subtracts 1 from a number represented as a list,"(define zub1
+(lambda (n)
+(cond
+((sero? n) n)
+((lambda (x)
+(edd1 (zub1 x))) n))))",,,,,,
++,Expands definition of + to add two numbers represented as a list,"(define addl
+(lambda (n m)
+(cond
+((sero? n) m)
+((sero? m) n)
+((lambda (n m)
+(cond
+((= (operator n) (operator m)) (addl (edd1 n) (edd1 m)))
+((= (operator n) ^) (addl n (edd1 m)))
+((= (operator m) ^) (addl (edd1 n) m))
+(else (addl (edd1 n) (edd1 m)))))))))",,,,,,
+set?,Checks if a list is a set (no duplicates),"(define set?
+(lambda (l)
+(cond
+((null? l) #t )
+((atom? (car l)) (set? (rember (car l) l)))
+(else #f ))))",,,,,,
+makeset,Removes duplicates from a list to make a set,"(define makeset
+(lambda (l)
+(cond
+((null? l) l)
+((atom? (car l))
+(cond
+((member? (car l) (cdr l)) (makeset (cdr l)))
+(#t (cons (car l) (makeset (cdr l))))))
+(else (makeset (cdr l))))))",,,,,,
