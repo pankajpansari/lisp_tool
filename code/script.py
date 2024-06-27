@@ -2,9 +2,9 @@ import os
 import pandas as pd
 from together import Together
 from tools import construct_prompt, encode_prompt, decode_output
-from test import run_tests
+from test_tools import run_tests
 
-os.environ['TOGETHER_API_KEY'] = ''
+os.environ['TOGETHER_API_KEY'] = '7191a5043c49e74068692dba6a6bded2e7b28e07f0695c94fbf78b02fe509c11'
 
 api_key = os.environ.get("TOGETHER_API_KEY")
 if not api_key:
@@ -12,7 +12,8 @@ if not api_key:
     
 file = pd.read_csv('functions.csv')
 
-#print(file)
+print(file)
+print(file.shape[0])
 
 def LLMCall(file, n):
     # n refers to function number (index in functions.csv)
@@ -26,15 +27,15 @@ def LLMCall(file, n):
     ]
     
     response1 = client.chat.completions.create(
-        model="meta-llama/Llama-3-70b-chat-hf",
+        model="mistralai/Mixtral-8x22B-Instruct-v0.1", #meta-llama/Llama-3-70b-chat-hf
         messages=messages,
-        temperature=0.2
+        temperature=0.1
     )
     
     response1_content = response1.choices[0].message.content
     #print("Output:", response1_content)
     
-    return decode_output(response1_content)
+    return response1_content
 
 def write(file, i, code):
     file.at[i, 'Definition'] = code
@@ -45,10 +46,15 @@ def write_error(file, i):
     file.to_csv('functions2.csv', index=False)
     
 for i in range(file.shape[0]):
+    code = decode_output(LLMCall(file, i))
+    print(code + "\n")
+    write(file, i, code)
+
+"""for i in range(file.shape[0]):
     samples = 0
     max_samples = 50
-    for i in range(max_samples) : 
-        code = LLMCall(file, i)
+    for j in range(max_samples) : 
+        code = decode_output(LLMCall(file, i))
         print(code)
         if run_tests(code, file, i) == True : 
             # write definition to functions.csv and break
@@ -58,3 +64,4 @@ for i in range(file.shape[0]):
     if success == False : 
         write_error(file, i)
         # store failure
+"""
