@@ -64,7 +64,8 @@ Here are some existing functions and a brief explanation of what they do :
     prompt = prompt + fn
         
     final_str = """
-Help me write the code. Output only the code for the function directly, do not include anything else. Make sure to use the correct keywords like lambda, cond, define and close all brackets correctly.
+Help me write the code. Your response should have only the code such that it can directly be passed to an evaluation compiler. Do not explain any aspect of the code. Output strictly the code only. 
+Make sure to use the correct keywords like lambda, cond, define and close all brackets correctly.
 """
     prompt = prompt + final_str
     
@@ -88,15 +89,18 @@ def get_encodings():
         
     return encodings
 
+encode_dict = get_encodings()
+
 def encode_prompt(prompt):
-    encode_dict = get_encodings()
+    #encode_dict = get_encodings()
     for key in encode_dict:
         prompt = prompt.replace(key, encode_dict[key])
     return prompt
     
-def decode_output(txt):
-    encode_dict = get_encodings()
+def decode_output(input_string):
+    code_block = input_string
     decode_dict = {value: key for key, value in encode_dict.items()}
-    for key in decode_dict:
-        txt = txt.replace(key, decode_dict[key])
-    return txt
+    #print(decode_dict)
+    for each in decode_dict.keys():
+        code_block = code_block.replace(each, decode_dict[each])
+    return code_block
